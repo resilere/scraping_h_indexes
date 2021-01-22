@@ -9,17 +9,16 @@ Created on Fri Apr 24 10:46:30 2020
 from selenium import webdriver
 
 import pandas as pd
-from   selenium.common.exceptions import TimeoutException
 
 #potential speakers
-speakers = pd.read_excel(r'/home/eser/Downloads/Potential Speakers for QCI 2.xlsx')
+directory= r'/home/eser/Downloads/python dosyalari/scraping_h_indexes/academics_list.xlsx'
+speakers = pd.read_excel(directory)
 
-data = pd.DataFrame(speakers, index = range(0,26))
-data.columns = ['Potential Speaker',	'Where I found',	'Status and Current affiliation',	'Previous Affiliations',	'H index',	'i10 Index'	,'Subject of speech',	'Comment',	'Contact'	]
-																		
+data = pd.DataFrame(speakers)
+data.columns = ['First Name', 'Last Name']								
 
-speaker_names = data['Potential Speaker']
-
+last_names = data['Last Name']
+first_names = data['First Name']
 
 browser = webdriver.Chrome()
 
@@ -27,18 +26,18 @@ h_index =[]
 i10_index = []
 current = []
 subjects = []
-for speaker in speaker_names:
-    browser.get('https://scholar.google.de/citations?hl=de&user=6ps6CuwAAAAJ')
-    box= browser.find_element_by_id("gs_hdr_sre")
-    box.click()
-    search_box = browser.find_element_by_id('gs_hdr_tsi')
+for i in range(len(last_names)):
+    browser.get('https://www.scopus.com/freelookup/form/author.uri?zone=TopNavBar&origin=searchauthorfreelookup')
     
+    search_last_name = browser.find_element_by_xpath('/html/body/div/div/div[1]/div[2]/div/div[3]/div/div[2]/div[2]/form/div[1]/div/div[1]/div[1]/div/div/label')
+    search_last_name.clear()
+    search_first_name= browser.find_element_by_xpath('/html/body/div/div/div[1]/div[2]/div/div[3]/div/div[2]/div[2]/form/div[1]/div/div[1]/div[2]/div/div/label')
+    search_first_name.clear()
+    button = browser.find_element_by_id('authorSubmitBtn')
     
-    submit = browser.find_element_by_name('btnG')
-    
-    search_box.send_keys(speaker)
-    
-    submit.click()
+    search_last_name.send_keys(last_names[i])
+    search_first_name.send_keys(first_names[i])
+    button.click()
     
     try:
         name = browser.find_element_by_class_name('gs_hlt')
